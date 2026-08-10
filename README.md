@@ -41,3 +41,14 @@ Evaluate exact nearest-neighbor retrieval in both learned spaces and the enginee
 ```
 
 The primary four-way table reports genre-label precision@1/5/10/20 with query-level bootstrap confidence intervals. A detailed table additionally compares cosine and Euclidean distance, while `step8_neighbors.parquet` stores ranked results. The generated qualitative-review CSV is intentionally left for human ratings; genre agreement is disclosed as a weak automated proxy, and the genre-metadata baseline as an oracle-like upper bound rather than audio-native retrieval.
+
+## Step 9: cross-dataset generalization
+
+Cache the exact-overlap portion of FMA Small, then evaluate the GTZAN-trained classifier and both embeddings without retraining:
+
+```bash
+.venv/bin/python -m generalization.build_fma_features
+.venv/bin/python -m generalization.run_evaluation
+```
+
+The conservative taxonomy alignment is `Hip-Hop → hiphop`, `Pop → pop`, and `Rock → rock` (3,000 FMA tracks). The five other FMA Small genres are excluded because they lack exact GTZAN equivalents. Reports include classification accuracy/F1, per-genre accuracy, retrieval precision@k, bootstrap intervals, and chance-adjusted retrieval drops to account for FMA's three-class evaluation versus GTZAN's ten classes.

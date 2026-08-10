@@ -1,0 +1,18 @@
+{
+  "training_dataset": "GTZAN",
+  "evaluation_dataset": "FMA Small exact taxonomy overlap",
+  "taxonomy_mapping": {
+    "Hip-Hop": "hiphop",
+    "Pop": "pop",
+    "Rock": "rock"
+  },
+  "excluded_fma_genres": [
+    "Electronic",
+    "Experimental",
+    "Folk",
+    "Instrumental",
+    "International"
+  ],
+  "reason": "Excluded genres have no defensible exact GTZAN equivalent.",
+  "retrieval_note": "Chance-adjusted precision is the primary cross-dataset comparison because FMA evaluation has 3 classes and GTZAN has 10."
+}

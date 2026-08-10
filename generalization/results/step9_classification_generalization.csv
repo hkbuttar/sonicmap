@@ -1,0 +1,2 @@
+dataset,n_tracks,n_genres,accuracy,accuracy_ci_low,accuracy_ci_high,f1_macro,gtzan_cv_accuracy,absolute_accuracy_drop
+fma_exact_overlap,2999,3,0.345781927309103,0.32977659219739913,0.36178726242080694,0.1281962372187871,0.7587185929648241,0.4129366656557211

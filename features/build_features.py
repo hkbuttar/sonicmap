@@ -33,7 +33,7 @@ def find_audio_files(audio_root: Path) -> list:
     return sorted(f for f in audio_root.rglob("*") if f.suffix.lower() in AUDIO_EXTENSIONS)
 
 
-def build(audio_root: Path, cache_dir: Path, label_from_parent: bool) -> tuple:
+def build(audio_root: Path, cache_dir: Path, label_from_parent: bool, files=None) -> tuple:
     audio_root = Path(audio_root)
     cache_dir = Path(cache_dir)
     mel_dir = cache_dir / "mel"
@@ -41,7 +41,7 @@ def build(audio_root: Path, cache_dir: Path, label_from_parent: bool) -> tuple:
     mel_dir.mkdir(parents=True, exist_ok=True)
     engineered_dir.mkdir(parents=True, exist_ok=True)
 
-    files = find_audio_files(audio_root)
+    files = find_audio_files(audio_root) if files is None else sorted(Path(f) for f in files)
     if not files:
         raise FileNotFoundError(f"No audio files found under {audio_root}")
 

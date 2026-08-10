@@ -1,0 +1,4 @@
+label,n,accuracy,genre
+4,1000,0.458,hiphop
+7,1000,0.147,pop
+9,999,0.43243243243243246,rock
