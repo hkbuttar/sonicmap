@@ -62,3 +62,13 @@ Generate gradually drifting playlists in both learned embedding spaces and compa
 ```
 
 The default evaluates 100 stratified seeds with 50 random playlists per seed and creates one demo playlist per genre for each embedding. Reports include average pairwise and adjacent cosine similarity, seed-genre retention, drift behavior, bootstrap confidence intervals, generated track sequences, and a blank qualitative-review sheet. Pass `--seed-track blues/blues.00000` to generate demos from a specific track.
+
+## Step 11: consolidated results
+
+Regenerate the full comparison table and honest findings report from all completed experiment artifacts:
+
+```bash
+.venv/bin/python -m results.compile_results
+```
+
+The generated `results/step11_comparison.csv` preserves metrics, confidence intervals, sources, and caveats; `results/step11_findings.md` summarizes augmentation, genre and mood modeling, embedding quality, cross-dataset degradation, and playlist coherence without treating weak genre proxies or oracle metadata as perceptual ground truth.

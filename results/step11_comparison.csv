@@ -1,0 +1,26 @@
+section,comparison,metric,value,ci_low,ci_high,source,caveat
+augmentation,cnn,accuracy_delta,0.08502512562814073,-0.003069463343218032,0.17311971459949949,step4 fold-paired CV,Positive values favor augmentation.
+augmentation,gbm,accuracy_delta,0.014000000000000012,-0.016854788228714744,0.04485478822871477,step4 fold-paired CV,Positive values favor augmentation.
+genre_classification,cnn,accuracy,0.7587185929648241,0.7277931037170527,0.7896440822125955,step4 5-fold CV,
+genre_classification,gbm,accuracy,0.7317035175879396,0.6933734470619312,0.7700335881139481,step4 5-fold CV,
+mood_regression,cnn,valence_r2,0.3818327069282531,0.2457197648177831,0.5179456490387232,step5 5-fold CV,
+mood_regression,gbm,valence_r2,0.395049500465393,0.3473074707355696,0.4427915301952165,step5 5-fold CV,
+mood_regression,gbm_minus_cnn,valence_r2_delta,0.013216793537139915,-0.15239455196881865,0.1788281390430985,step5 fold-paired CV,Positive values favor GBM.
+mood_regression,cnn,arousal_r2,0.4042634129524231,0.2140544289323017,0.5944723969725444,step5 5-fold CV,
+mood_regression,gbm,arousal_r2,0.4460582971572876,0.3945964768447442,0.497520117469831,step5 5-fold CV,
+mood_regression,gbm_minus_cnn,arousal_r2_delta,0.04179488420486448,-0.10156866571692881,0.18515843412665778,step5 fold-paired CV,Positive values favor GBM.
+embedding,classification_embedding,cosine_silhouette,0.3337051272392273,,,step6,
+embedding,triplet_embedding,cosine_silhouette,0.254576176404953,,,step7,
+embedding,triplet_training,triplet_loss_reduction,0.053089748978614806,,,step7,
+similarity,classification_embedding,precision_at_10,0.8898898898898899,0.8763738738738739,0.9030030030030032,step8 GTZAN in-sample retrieval,Genre agreement is a weak similarity proxy.
+similarity,triplet_embedding,precision_at_10,0.6769769769769769,0.6561561561561562,0.6962962962962962,step8 GTZAN in-sample retrieval,Genre agreement is a weak similarity proxy.
+similarity,engineered_features,precision_at_10,0.5225225225225224,0.5028003003003003,0.5411436436436435,step8 GTZAN in-sample retrieval,Genre agreement is a weak similarity proxy.
+similarity,metadata_genre,precision_at_10,1.0,1.0,1.0,step8 GTZAN in-sample retrieval,"Oracle-like label baseline, not audio retrieval."
+generalization,genre_cnn,fma_accuracy,0.345781927309103,0.3297765921973991,0.3617872624208069,step9 FMA exact-overlap,Only three exact-overlap genres.
+generalization,genre_cnn,absolute_accuracy_drop,0.4129366656557211,,,GTZAN CV minus FMA,
+generalization,classification_embedding,fma_precision_at_10,0.6388796265421808,0.6282752584194731,0.6492855951983993,step9 FMA retrieval,
+generalization,classification_embedding,chance_adjusted_precision_drop_at_10,0.4193360536245978,,,step9,Adjusts for 3 FMA versus 10 GTZAN classes.
+generalization,triplet_embedding,fma_precision_at_10,0.6131710570190063,0.602864288096032,0.6239088029343114,step9 FMA retrieval,
+generalization,triplet_embedding,chance_adjusted_precision_drop_at_10,0.2213290089604095,,,step9,Adjusts for 3 FMA versus 10 GTZAN classes.
+playlist,classification_embedding,pairwise_similarity_lift_vs_random,0.3903250322341919,0.3812437021169066,0.3989307908229529,step10 100 seeds,"Compare lifts, not raw cosine levels across spaces."
+playlist,triplet_embedding,pairwise_similarity_lift_vs_random,0.2428242930710315,0.2390449210323393,0.2464174465392529,step10 100 seeds,"Compare lifts, not raw cosine levels across spaces."
