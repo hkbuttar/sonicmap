@@ -72,3 +72,14 @@ Regenerate the full comparison table and honest findings report from all complet
 ```
 
 The generated `results/step11_comparison.csv` preserves metrics, confidence intervals, sources, and caveats; `results/step11_findings.md` summarizes augmentation, genre and mood modeling, embedding quality, cross-dataset degradation, and playlist coherence without treating weak genre proxies or oracle metadata as perceptual ground truth.
+
+## Step 12: testing and validation
+
+Run the unit/integration suite and the artifact-backed validation audit:
+
+```bash
+.venv/bin/python -m pytest -q
+.venv/bin/python -m validation.run_validation
+```
+
+The audit checks classifier/regressor performance against random baselines, CV partition and augmentation leakage integrity, triplet-loss and silhouette improvement, similarity sanity, FMA cache/result alignment, and playlist lift. Critical failures return a nonzero exit code; statistically inconclusive findings remain explicitly inconclusive rather than being forced into pass/fail claims.
