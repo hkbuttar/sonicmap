@@ -31,3 +31,13 @@ Train a separate similarity network with explicit genre-supervised anchor/positi
 ```
 
 Same-genre positives are sampled from a different source track, preventing an original clip and its augmentation from forming a trivial pair; negatives come from another genre. The default uses 2,000 triplets per epoch and margin `0.2`. Artifacts in `embeddings/results/triplet/` use the same ordering and 128-dimensional normalized format as Step 6, and include loss history, UMAP coordinates, silhouette scores, a checkpoint, and the silhouette delta versus the classification-derived embedding.
+
+## Step 8: similarity search and evaluation
+
+Evaluate exact nearest-neighbor retrieval in both learned spaces and the engineered-feature and metadata baselines:
+
+```bash
+.venv/bin/python -m similarity.run_evaluation
+```
+
+The primary four-way table reports genre-label precision@1/5/10/20 with query-level bootstrap confidence intervals. A detailed table additionally compares cosine and Euclidean distance, while `step8_neighbors.parquet` stores ranked results. The generated qualitative-review CSV is intentionally left for human ratings; genre agreement is disclosed as a weak automated proxy, and the genre-metadata baseline as an oracle-like upper bound rather than audio-native retrieval.
