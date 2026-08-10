@@ -22,7 +22,7 @@ git-ignored — fetch them with the scripts in `scripts/download_*.py`.
     rather than silently corrected, since "cleaning" GTZAN without a
     principled, published relabeling introduces its own bias.
 
-## FMA subset (secondary, cross-dataset generalization only — Step 9)
+## FMA subset (secondary, cross-dataset generalization only)
 
 - `fma_small`: 8,000 tracks, 30s clips, 8 balanced genres, ~7.2GB.
 - `fma_metadata`: track/genre/artist tables (`tracks.csv`, `genres.csv`,
@@ -32,14 +32,14 @@ git-ignored — fetch them with the scripts in `scripts/download_*.py`.
 - Deliberately the *smallest* official FMA split (not `fma_medium`,
   `fma_large`, or the full 917GB `fma_full` corpus) — this project uses
   it only as an out-of-distribution eval set for the genre classifier and
-  both embeddings (Step 9), not for training, so a targeted pull is the
+  both embeddings, not for training, so a targeted pull is the
   right scope.
 - Genre taxonomy differs from GTZAN's (FMA's top-level genres are
   broader/differently defined), so cross-dataset genre alignment uses a
   manual label mapping — documented where implemented in
   `generalization/`, not assumed to be 1:1.
 
-## DEAM (mood: valence-arousal regression targets — Step 5)
+## DEAM (valence-arousal regression targets)
 
 - MediaEval Database for Emotional Analysis in Music: 1,802 excerpts (45s
   each) with continuous valence/arousal annotations from multiple

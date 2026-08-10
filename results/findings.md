@@ -1,4 +1,4 @@
-# Step 11 — Results and Honest Comparison
+# Results and Honest Comparison
 
 ## Headline results
 
@@ -18,7 +18,7 @@ Augmentation produced a substantial observed CNN gain at this dataset size, but 
 
 The purpose-built triplet objective reduced its training loss, but it did **not** beat the simpler classification-derived embedding on genre-based retrieval, silhouette score, or playlist lift. Its positive result was robustness: after correcting for the three-class FMA versus ten-class GTZAN evaluation, its cross-dataset retrieval drop was smaller.
 
-The genre CNN generalized poorly to FMA, confirming a large distribution gap. Step 8 retrieval is in-sample and uses genre agreement as a weak proxy, so its high scores should not be interpreted as human perceptual similarity. The metadata baseline is an oracle-like ceiling because it directly uses the evaluation label. Playlist comparisons are valid as within-space lifts over random; raw cosine values across separately trained spaces are not directly comparable.
+The genre CNN generalized poorly to FMA, confirming a large distribution gap. Similarity evaluation retrieval is in-sample and uses genre agreement as a weak proxy, so its high scores should not be interpreted as human perceptual similarity. The metadata baseline is an oracle-like ceiling because it directly uses the evaluation label. Playlist comparisons are valid as within-space lifts over random; raw cosine values across separately trained spaces are not directly comparable.
 
 ## Scope and limitations
 

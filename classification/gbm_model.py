@@ -1,6 +1,6 @@
 """Gradient-boosting baseline on engineered features (MFCC/chroma/tempo/
 spectral-shape statistics from features/engineered.py) — the classical
-alternative to the CNN, compared head-to-head in Step 4."""
+alternative compared head-to-head with the CNN."""
 
 import numpy as np
 import xgboost as xgb

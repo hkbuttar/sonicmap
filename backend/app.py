@@ -52,7 +52,7 @@ def _projections():
 
 @lru_cache(maxsize=1)
 def _neighbors():
-    path = ROOT / "similarity/results/step8_neighbors.parquet"
+    path = ROOT / "similarity/results/neighbors.parquet"
     if not path.exists():
         raise HTTPException(503, "Similarity neighbor artifact is unavailable")
     return pd.read_parquet(path)
@@ -71,10 +71,10 @@ def root():
 @app.get("/api/health")
 def health():
     required = [
-        "results/step11_comparison.csv",
+        "results/comparison.csv",
         "embeddings/results/classification/classification_projection.csv",
         "embeddings/results/triplet/triplet_projection.csv",
-        "similarity/results/step8_neighbors.parquet",
+        "similarity/results/neighbors.parquet",
     ]
     missing = [path for path in required if not (ROOT / path).exists()]
     return {"status": "ok" if not missing else "degraded", "missing_artifacts": missing}
@@ -82,7 +82,7 @@ def health():
 
 @app.get("/api/summary")
 def summary():
-    comparison = _csv("results/step11_comparison.csv")
+    comparison = _csv("results/comparison.csv")
     def value(section, name, metric):
         row = comparison[
             (comparison.section == section) & (comparison.comparison == name)
@@ -104,12 +104,12 @@ def summary():
 
 @app.get("/api/classification")
 def classification_results():
-    return _records(_csv("classification/results/step4_classification_summary.csv"))
+    return _records(_csv("classification/results/genre_classification_summary.csv"))
 
 
 @app.get("/api/mood")
 def mood_results():
-    return _records(_csv("mood/results/step5_mood_regression_summary.csv"))
+    return _records(_csv("mood/results/mood_regression_summary.csv"))
 
 
 @app.get("/api/embeddings/{space}")
@@ -155,9 +155,9 @@ def similarity_search(
 @app.get("/api/generalization")
 def generalization_results():
     return {
-        "classification": _records(_csv("generalization/results/step9_classification_generalization.csv")),
-        "per_genre": _records(_csv("generalization/results/step9_per_genre_accuracy.csv")),
-        "similarity": _records(_csv("generalization/results/step9_similarity_generalization.csv")),
+        "classification": _records(_csv("generalization/results/classification_generalization.csv")),
+        "per_genre": _records(_csv("generalization/results/per_genre_accuracy.csv")),
+        "similarity": _records(_csv("generalization/results/similarity_generalization.csv")),
     }
 
 
@@ -188,5 +188,5 @@ def generate_playlist(
 
 @app.get("/api/validation")
 def validation_results():
-    checks = _csv("validation/results/step12_validation_checks.csv")
+    checks = _csv("validation/results/validation_checks.csv")
     return {"counts": checks.status.value_counts().to_dict(), "checks": _records(checks)}

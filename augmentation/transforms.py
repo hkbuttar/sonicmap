@@ -1,5 +1,5 @@
-"""Waveform augmentation transforms for addressing GTZAN's small size
-(Step 3): pitch-shift, time-stretch, and additive Gaussian noise.
+"""Waveform augmentation transforms for addressing GTZAN's small size:
+pitch-shift, time-stretch, and additive Gaussian noise.
 
 Each transform operates on a raw waveform (pre fixed-length trim/pad) and
 returns a waveform that may have a different sample count than the input

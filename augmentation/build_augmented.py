@@ -3,7 +3,7 @@ their mel-spectrograms + engineered features, one subdirectory per
 augmentation variant.
 
 Each cached track keeps its original track_id in the manifest's
-`source_track_id` column — Step 4's cross-validation must group folds by
+`source_track_id` column — genre-classification cross-validation must group folds by
 this column (not by the augmented row's own id) so a track and its
 augmented siblings never land on opposite sides of a train/test split;
 otherwise held-out accuracy would be inflated by near-duplicate leakage.

@@ -1,6 +1,6 @@
-"""Step 6: train the full genre CNN and extract its penultimate embedding.
+"""Train the full genre CNN and extract its penultimate embedding.
 
-The augmented condition won Step 4's genre-CNN comparison, so augmentation
+The augmented condition won the genre-CNN comparison, so augmentation
 is enabled by default for training. Embeddings and projections are always
 extracted for original GTZAN tracks only.
 """

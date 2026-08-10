@@ -1,6 +1,5 @@
-"""Log-mel spectrogram extraction: the CNN input representation used by
-genre classification (Step 4), mood regression (Step 5), and both
-embeddings (Steps 6-7)."""
+"""Log-mel spectrogram extraction used by genre classification, mood
+regression, and both learned embeddings."""
 
 import numpy as np
 import librosa

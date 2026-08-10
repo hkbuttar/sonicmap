@@ -3,7 +3,7 @@ trains from scratch, CPU-only, on a few hundred to a few thousand 29s
 clips per fold, so a small parameter count matters for wall-clock time,
 not just overfitting risk.
 
-`embed()` exposes the 128-dim penultimate layer directly — Step 6 reuses
+`embed()` exposes the 128-dim penultimate layer directly; embedding extraction reuses
 this as the classification-derived embedding, extracted from a model
 trained on the full dataset rather than retrained from scratch.
 """

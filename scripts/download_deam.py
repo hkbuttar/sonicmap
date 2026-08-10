@@ -1,6 +1,6 @@
 """Download DEAM (MediaEval Database for Emotional Analysis in Music):
 1,802 excerpts with real continuous valence-arousal annotations, used for
-Step 5's mood regression instead of a genre-derived mood proxy.
+continuous mood regression instead of a genre-derived mood proxy.
 
 Source: https://cvml.unige.ch/databases/DEAM/
 """

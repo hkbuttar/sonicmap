@@ -1,4 +1,4 @@
-"""Step 10: generate embedding-traversal playlists and evaluate coherence."""
+"""Generate embedding-traversal playlists and evaluate coherence."""
 
 import argparse
 import json
@@ -112,14 +112,14 @@ def run(features_dir, classification_dir, triplet_dir, output_dir, length, seeds
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     summary = pd.DataFrame(summaries)
-    summary.to_csv(output_dir / "step10_playlist_coherence.csv", index=False)
-    evaluation.to_csv(output_dir / "step10_playlist_per_seed.csv", index=False)
+    summary.to_csv(output_dir / "playlist_coherence.csv", index=False)
+    evaluation.to_csv(output_dir / "playlist_per_seed.csv", index=False)
     demos = pd.DataFrame(demo_rows)
-    demos.to_csv(output_dir / "step10_generated_playlists.csv", index=False)
+    demos.to_csv(output_dir / "generated_playlists.csv", index=False)
     review = demos.copy()
     review["human_transition_rating_1_to_5"] = ""
     review["human_notes"] = ""
-    review.to_csv(output_dir / "step10_qualitative_review.csv", index=False)
+    review.to_csv(output_dir / "qualitative_review.csv", index=False)
     protocol = {
         "strategy": "greedy local traversal with a linearly increasing target distance from the seed",
         "playlist_length": length, "drift_quantile": drift_quantile,
@@ -130,7 +130,7 @@ def run(features_dir, classification_dir, triplet_dir, output_dir, length, seeds
         "qualitative_note": "Human review remains necessary; genre and embedding similarity do not fully capture playlist flow.",
         "seed": seed,
     }
-    (output_dir / "step10_protocol.json").write_text(json.dumps(protocol, indent=2) + "\n")
+    (output_dir / "protocol.json").write_text(json.dumps(protocol, indent=2) + "\n")
     return summary, demos
 
 

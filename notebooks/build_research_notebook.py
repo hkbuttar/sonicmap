@@ -30,7 +30,7 @@ CELLS = [
 
 Genre and continuous valence–arousal modeling, audio-native similarity search, cross-dataset validation, and playlist generation on real audio.
 
-This notebook is an executed view of the canonical CSV/JSON experiment artifacts from Steps 4–11. It does not retrain models, so it remains quick to reproduce on CPU. All values below are loaded from disk rather than manually transcribed.
+This notebook is an executed view of the canonical CSV/JSON experiment artifacts. It does not retrain models, so it remains quick to reproduce on CPU. All values below are loaded from disk rather than manually transcribed.
 """),
     markdown("""## Experimental scope
 
@@ -59,7 +59,7 @@ print(f"Artifact root: {ROOT}")
 
 The CNN and gradient-boosted model were evaluated with stratified five-fold cross-validation. Augmented variants were confined to the training side of each fold to prevent near-duplicate leakage.
 """),
-    code("""genre = pd.read_csv(ROOT / "classification/results/step4_classification_summary.csv")
+    code("""genre = pd.read_csv(ROOT / "classification/results/genre_classification_summary.csv")
 accuracy = genre[genre.metric == "accuracy"].copy()
 accuracy["condition"] = accuracy["model"].str.upper() + np.where(accuracy["augmented"], " + augmentation", "")
 
@@ -77,7 +77,7 @@ accuracy[["model", "augmented", "mean", "ci_low", "ci_high"]]
 
 Valence and arousal were modeled as continuous DEAM targets. R² is shown because it expresses improvement over a mean-target predictor; MAE and RMSE remain in the source artifact.
 """),
-    code("""mood = pd.read_csv(ROOT / "mood/results/step5_mood_regression_summary.csv")
+    code("""mood = pd.read_csv(ROOT / "mood/results/mood_regression_summary.csv")
 r2 = mood[mood.metric.str.endswith("_r2")].copy()
 r2["target"] = r2.metric.str.replace("_r2", "", regex=False)
 
@@ -126,7 +126,7 @@ embedding_metrics[["embedding", "embedding_silhouette_cosine", "projection_silho
 
 Precision@k uses same-genre agreement as a weak automated relevance signal. The metadata method directly uses that label, making it an oracle-like ceiling rather than audio retrieval.
 """),
-    code("""retrieval = pd.read_csv(ROOT / "similarity/results/step8_similarity_comparison.csv")
+    code("""retrieval = pd.read_csv(ROOT / "similarity/results/similarity_comparison.csv")
 fig, ax = plt.subplots(figsize=(8, 5))
 for method, group in retrieval.groupby("method", sort=False):
     ax.plot(group.k, group.precision_at_k, marker="o", label=method.replace("_", " "))
@@ -142,9 +142,9 @@ retrieval[retrieval.k == 10][["method", "precision_at_k", "ci_low", "ci_high"]]
 
 GTZAN-trained models were evaluated on FMA without retraining. Retrieval drops were chance-adjusted because FMA's exact-overlap evaluation has three classes while GTZAN has ten.
 """),
-    code("""generalization = pd.read_csv(ROOT / "generalization/results/step9_classification_generalization.csv")
-per_genre = pd.read_csv(ROOT / "generalization/results/step9_per_genre_accuracy.csv")
-ood = pd.read_csv(ROOT / "generalization/results/step9_similarity_generalization.csv")
+    code("""generalization = pd.read_csv(ROOT / "generalization/results/classification_generalization.csv")
+per_genre = pd.read_csv(ROOT / "generalization/results/per_genre_accuracy.csv")
+ood = pd.read_csv(ROOT / "generalization/results/similarity_generalization.csv")
 
 fig, axes = plt.subplots(1, 2, figsize=(11, 4))
 axes[0].bar(["GTZAN CV", "FMA OOD"], [generalization.gtzan_cv_accuracy.iloc[0], generalization.accuracy.iloc[0]], color=["#4C78A8", "#E45756"])
@@ -161,7 +161,7 @@ per_genre[["genre", "n", "accuracy"]]
 
 Playlists used a greedy local walk with a gradually increasing target distance from the seed. Each method was compared with random playlists inside its own space; raw cosine levels are not comparable across independently trained spaces.
 """),
-    code("""playlists = pd.read_csv(ROOT / "similarity/results/playlists/step10_playlist_coherence.csv")
+    code("""playlists = pd.read_csv(ROOT / "similarity/results/playlists/playlist_coherence.csv")
 pairwise = playlists[playlists.metric == "pairwise_similarity"].copy()
 fig, ax = plt.subplots(figsize=(7, 4))
 ax.bar(pairwise.method.str.replace("_embedding", "", regex=False), pairwise.mean_difference,
@@ -176,8 +176,8 @@ playlists[playlists.metric.isin(["pairwise_similarity", "seed_genre_fraction", "
 """),
     markdown("""## 7. Consolidated findings and limitations
 """),
-    code("""comparison = pd.read_csv(ROOT / "results/step11_comparison.csv")
-print((ROOT / "results/step11_findings.md").read_text())
+    code("""comparison = pd.read_csv(ROOT / "results/comparison.csv")
+print((ROOT / "results/findings.md").read_text())
 comparison
 """),
     markdown("""## 8. Complete findings ledger
@@ -186,12 +186,12 @@ The tables below intentionally preserve every reported quantitative result, not 
 """),
     markdown("""### 8.1 Genre classification: every model, condition, and metric
 """),
-    code("""genre_all = pd.read_csv(ROOT / "classification/results/step4_classification_summary.csv")
+    code("""genre_all = pd.read_csv(ROOT / "classification/results/genre_classification_summary.csv")
 print(genre_all.to_string(index=False))
 """),
     markdown("""### 8.2 Mood regression: MAE, RMSE, and R² for both targets and models
 """),
-    code("""mood_all = pd.read_csv(ROOT / "mood/results/step5_mood_regression_summary.csv")
+    code("""mood_all = pd.read_csv(ROOT / "mood/results/mood_regression_summary.csv")
 print(mood_all.to_string(index=False))
 """),
     markdown("""### 8.3 Triplet optimization diagnostics
@@ -210,7 +210,7 @@ print(triplet_history.to_string(index=False))
 
 Cosine and Euclidean rankings were effectively identical for the L2-normalized learned embeddings. Engineered features performed slightly better with cosine. The full distance table follows.
 """),
-    code("""distance_all = pd.read_csv(ROOT / "similarity/results/step8_distance_comparison.csv")
+    code("""distance_all = pd.read_csv(ROOT / "similarity/results/distance_comparison.csv")
 print(distance_all.to_string(index=False))
 """),
     markdown("""### 8.5 FMA generalization: classifier, per-genre, and retrieval results
@@ -218,34 +218,34 @@ print(distance_all.to_string(index=False))
 The classifier suffered a large absolute distribution-shift loss. Pop was the weakest aligned FMA genre. The classification embedding remained slightly stronger in absolute FMA precision, while the triplet embedding showed the smaller chance-adjusted drop at every reported k.
 """),
     code("""print("CLASSIFICATION")
-print(pd.read_csv(ROOT / "generalization/results/step9_classification_generalization.csv").to_string(index=False))
+print(pd.read_csv(ROOT / "generalization/results/classification_generalization.csv").to_string(index=False))
 print("\\nPER GENRE")
-print(pd.read_csv(ROOT / "generalization/results/step9_per_genre_accuracy.csv").to_string(index=False))
+print(pd.read_csv(ROOT / "generalization/results/per_genre_accuracy.csv").to_string(index=False))
 print("\\nSIMILARITY")
-print(pd.read_csv(ROOT / "generalization/results/step9_similarity_generalization.csv").to_string(index=False))
+print(pd.read_csv(ROOT / "generalization/results/similarity_generalization.csv").to_string(index=False))
 """),
     markdown("""### 8.6 Playlist evaluation: every coherence and drift metric
 
 Both learned spaces beat their own random baselines for pairwise similarity, adjacent similarity, seed-genre retention, and monotonic drift. Generated playlists ended closer to their seeds than random playlists, which is expected from a coherence-controlled traversal. Cross-space conclusions use lift over random, not raw cosine values.
 """),
-    code("""playlist_all = pd.read_csv(ROOT / "similarity/results/playlists/step10_playlist_coherence.csv")
+    code("""playlist_all = pd.read_csv(ROOT / "similarity/results/playlists/playlist_coherence.csv")
 print(playlist_all.to_string(index=False))
 """),
     markdown("""### 8.7 Findings not yet resolved automatically
 
 - Genre precision is only a weak proxy for perceptual similarity.
 - The metadata baseline is an oracle-like ceiling, not an audio system.
-- The generated Step 8 and Step 10 qualitative-review CSVs remain intentionally unrated; no human-listening conclusion is fabricated here.
-- Step 8 is in-sample retrieval. Step 9 is the genuine unseen-distribution test.
+- The generated Similarity evaluation and Playlist generation qualitative-review CSVs remain intentionally unrated; no human-listening conclusion is fabricated here.
+- Similarity evaluation is in-sample retrieval. Cross-dataset generalization is the genuine unseen-distribution test.
 - FMA used 2,999 of 3,000 selected tracks because one source MP3 was corrupt.
 - The triplet embedding's lower cross-dataset degradation is a robustness result, not evidence that it was the best absolute retriever.
 """),
     markdown("""## 9. Testing and validation audit
 
-Step 12 combined the 39-test unit/integration suite with an artifact-backed audit. It checked random baselines, fold integrity, augmentation leakage, triplet optimization and initial-to-final silhouette, FMA alignment, retrieval sanity, and playlist lift.
+The test suite and artifact-backed audit checked random baselines, fold integrity, augmentation leakage, triplet optimization and initial-to-final silhouette, FMA alignment, retrieval sanity, and playlist lift.
 """),
-    code("""validation_checks = pd.read_csv(ROOT / "validation/results/step12_validation_checks.csv")
-print((ROOT / "validation/results/step12_validation_report.md").read_text())
+    code("""validation_checks = pd.read_csv(ROOT / "validation/results/validation_checks.csv")
+print((ROOT / "validation/results/validation_report.md").read_text())
 validation_checks
 """),
     markdown("""All 18 critical and positive sanity checks passed. The FMA classifier comparison with a balanced three-class random baseline remained **inconclusive**, because its 95% confidence interval crossed chance. Human perceptual similarity remains unvalidated until the qualitative listening sheets are completed.

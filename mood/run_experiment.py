@@ -1,4 +1,4 @@
-"""Step 5: CNN vs GBM valence-arousal regression with CV confidence intervals."""
+"""Compare CNN and GBM valence-arousal regression with CV confidence intervals."""
 
 import argparse
 import json
@@ -75,7 +75,7 @@ def main() -> int:
     parser.add_argument("--n-folds", type=int, default=5)
     parser.add_argument("--epochs", type=int, default=15)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--out", type=Path, default=Path("mood/results/step5_mood_regression.csv"))
+    parser.add_argument("--out", type=Path, default=Path("mood/results/mood_regression.csv"))
     args = parser.parse_args()
     with tempfile.TemporaryDirectory(prefix="sonicmap_mood_cv_") as temp:
         results = run(args.features_dir, args.annotations_dir, args.n_folds, args.epochs, args.seed, Path(temp))

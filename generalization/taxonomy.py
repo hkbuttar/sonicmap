@@ -1,4 +1,4 @@
-"""Conservative FMA-to-GTZAN genre alignment for Step 9."""
+"""Conservative FMA-to-GTZAN genre alignment for generalization tests."""
 
 FMA_TO_GTZAN = {
     "Hip-Hop": "hiphop",

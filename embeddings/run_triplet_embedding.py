@@ -1,4 +1,4 @@
-"""Step 7: train and evaluate a purpose-built triplet-loss embedding."""
+"""Train and evaluate a purpose-built triplet-loss embedding."""
 
 import argparse
 import json

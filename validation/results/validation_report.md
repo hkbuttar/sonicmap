@@ -1,4 +1,4 @@
-# Step 12 — Testing and Validation
+# Testing and Validation
 
 - Passed: 18
 - Inconclusive: 1
@@ -30,6 +30,6 @@
 
 All critical correctness and sanity checks passed. The only inconclusive result was the FMA classifier versus a balanced three-class random baseline: its confidence interval overlapped chance. This is retained as a substantive negative generalization finding, not hidden or converted into a passing claim.
 
-The seeded untrained triplet network had cosine silhouette -0.153810; training raised it to the saved Step 7 value while also reducing triplet loss.
+The seeded untrained triplet network had cosine silhouette -0.153810; training raised it to the saved triplet-embedding value while also reducing triplet loss.
 
 Synthetic pure-tone and silence feature tests remain in the pytest suite. Human perceptual review is not marked as validated because the qualitative rating sheets have not been completed.

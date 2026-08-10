@@ -1,7 +1,7 @@
 {
   "automated_relevance_signal": "same GTZAN genre label",
   "warning": "Genre agreement is a weak proxy for perceptual similarity; metadata_genre is an oracle-like upper bound, not audio retrieval.",
-  "evaluation_scope": "In-sample retrieval on the original GTZAN tracks used for full-data embedding training; Step 9 provides the out-of-distribution test.",
+  "evaluation_scope": "In-sample retrieval on the original GTZAN tracks used for full-data embedding training; FMA provides the out-of-distribution test.",
   "primary_distance": "cosine for audio representations; exact label match for metadata",
   "ks": [
     1,

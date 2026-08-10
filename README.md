@@ -1,6 +1,8 @@
 # SonicMap — Genre/Mood Classification & Audio-Native Similarity Search
 Music genre and valence-arousal mood modeling with audio-native similarity search. CNN and gradient-boosted classifiers, a contrastive similarity embedding compared against a classification-derived one, cross-dataset validation, and playlist generation. Real audio, CPU-only.
 
+**[View the live SonicMap demo](https://sonicmap-sigma.vercel.app/)**
+
 ## Headline findings
 
 | Experiment | Result |
@@ -10,9 +12,9 @@ Music genre and valence-arousal mood modeling with audio-native similarity searc
 | GTZAN similarity P@10 | 0.890 classification embedding / 0.677 triplet |
 | FMA out-of-distribution accuracy | 34.6% on 2,999 exact-overlap tracks |
 | Playlist pairwise-similarity lift | +0.390 classification / +0.243 triplet |
-| Validation | 39 tests; 18 passed audit checks, 1 inconclusive, 0 failed |
+| Validation | 45 tests; 18 passed audit checks, 1 inconclusive, 0 failed |
 
-The central negative result is useful: training specifically with triplet loss did not beat the classification-derived embedding in-distribution. It did, however, suffer a smaller chance-adjusted retrieval drop on FMA. See [`results/step11_findings.md`](results/step11_findings.md) and the executed [`notebooks/research.ipynb`](notebooks/research.ipynb) for the complete interpretation and limitations.
+The central negative result is useful: training specifically with triplet loss did not beat the classification-derived embedding in-distribution. It did, however, suffer a smaller chance-adjusted retrieval drop on FMA. See [`results/findings.md`](results/findings.md) and the executed [`notebooks/research.ipynb`](notebooks/research.ipynb) for the complete interpretation and limitations.
 
 ## Repository map
 
@@ -24,7 +26,7 @@ mood/              continuous DEAM valence-arousal regression
 embeddings/        classification-derived and triplet spaces
 similarity/        retrieval evaluation and playlist traversal
 generalization/    GTZAN-to-FMA evaluation
-validation/        artifact-backed Step 12 audit
+validation/        artifact-backed validation audit
 backend/           FastAPI read-only results API
 frontend/          React, TypeScript, Vite dashboard
 notebooks/         executed research notebook and builder
@@ -42,7 +44,7 @@ cd frontend && npm install && cd ..
 
 Raw audio and feature caches are intentionally excluded from Git. Download datasets with `scripts/download_*.py`; dataset choices and limitations are documented in [`data/DATASETS.md`](data/DATASETS.md).
 
-## Step 5: mood regression
+## Mood regression
 
 Run the DEAM valence-arousal comparison after downloading DEAM and caching its features:
 
@@ -53,9 +55,9 @@ python -m mood.run_experiment --n-folds 5 --epochs 15
 
 The experiment predicts DEAM's real song-level continuous valence and arousal annotations. It reports MAE, RMSE, and R² separately for each coordinate, with fold-level 95% t confidence intervals, for both a mel-spectrogram CNN and gradient-boosted engineered-feature regressors.
 
-## Step 6: classification-derived embedding
+## Classification-derived embedding
 
-Train the best Step 4 CNN condition on all GTZAN training data, extract its 128-dimensional penultimate layer for each original track, and create a UMAP projection:
+Train the best genre-classification CNN condition on all GTZAN training data, extract its 128-dimensional penultimate layer for each original track, and create a UMAP projection:
 
 ```bash
 .venv/bin/python -m embeddings.run_classification_embedding --epochs 15
@@ -63,7 +65,7 @@ Train the best Step 4 CNN condition on all GTZAN training data, extract its 128-
 
 Artifacts are written to `embeddings/results/classification/`: L2-normalized embeddings for similarity search, track metadata and 2D coordinates, a projection plot, cosine silhouette score against genre labels, and the full-data CNN checkpoint. Use `--projection tsne` for t-SNE or `--no-augmentation` to train only on original tracks.
 
-## Step 7: triplet-loss embedding
+## Triplet-loss embedding
 
 Train a separate similarity network with explicit genre-supervised anchor/positive/negative triplets:
 
@@ -71,9 +73,9 @@ Train a separate similarity network with explicit genre-supervised anchor/positi
 .venv/bin/python -m embeddings.run_triplet_embedding --epochs 15
 ```
 
-Same-genre positives are sampled from a different source track, preventing an original clip and its augmentation from forming a trivial pair; negatives come from another genre. The default uses 2,000 triplets per epoch and margin `0.2`. Artifacts in `embeddings/results/triplet/` use the same ordering and 128-dimensional normalized format as Step 6, and include loss history, UMAP coordinates, silhouette scores, a checkpoint, and the silhouette delta versus the classification-derived embedding.
+Same-genre positives are sampled from a different source track, preventing an original clip and its augmentation from forming a trivial pair; negatives come from another genre. The default uses 2,000 triplets per epoch and margin `0.2`. Artifacts in `embeddings/results/triplet/` use the same ordering and 128-dimensional normalized format as the classification-derived representation, and include loss history, UMAP coordinates, silhouette scores, a checkpoint, and the silhouette delta versus that baseline.
 
-## Step 8: similarity search and evaluation
+## Similarity search and evaluation
 
 Evaluate exact nearest-neighbor retrieval in both learned spaces and the engineered-feature and metadata baselines:
 
@@ -81,9 +83,9 @@ Evaluate exact nearest-neighbor retrieval in both learned spaces and the enginee
 .venv/bin/python -m similarity.run_evaluation
 ```
 
-The primary four-way table reports genre-label precision@1/5/10/20 with query-level bootstrap confidence intervals. A detailed table additionally compares cosine and Euclidean distance, while `step8_neighbors.parquet` stores ranked results. The generated qualitative-review CSV is intentionally left for human ratings; genre agreement is disclosed as a weak automated proxy, and the genre-metadata baseline as an oracle-like upper bound rather than audio-native retrieval.
+The primary four-way table reports genre-label precision@1/5/10/20 with query-level bootstrap confidence intervals. A detailed table additionally compares cosine and Euclidean distance, while `neighbors.parquet` stores ranked results. The generated qualitative-review CSV is intentionally left for human ratings; genre agreement is disclosed as a weak automated proxy, and the genre-metadata baseline as an oracle-like upper bound rather than audio-native retrieval.
 
-## Step 9: cross-dataset generalization
+## Cross-dataset generalization
 
 Cache the exact-overlap portion of FMA Small, then evaluate the GTZAN-trained classifier and both embeddings without retraining:
 
@@ -94,7 +96,7 @@ Cache the exact-overlap portion of FMA Small, then evaluate the GTZAN-trained cl
 
 The conservative taxonomy alignment is `Hip-Hop → hiphop`, `Pop → pop`, and `Rock → rock` (3,000 FMA tracks). The five other FMA Small genres are excluded because they lack exact GTZAN equivalents. Reports include classification accuracy/F1, per-genre accuracy, retrieval precision@k, bootstrap intervals, and chance-adjusted retrieval drops to account for FMA's three-class evaluation versus GTZAN's ten classes.
 
-## Step 10: playlist generation
+## Playlist generation
 
 Generate gradually drifting playlists in both learned embedding spaces and compare their coherence with matched random playlists:
 
@@ -104,7 +106,7 @@ Generate gradually drifting playlists in both learned embedding spaces and compa
 
 The default evaluates 100 stratified seeds with 50 random playlists per seed and creates one demo playlist per genre for each embedding. Reports include average pairwise and adjacent cosine similarity, seed-genre retention, drift behavior, bootstrap confidence intervals, generated track sequences, and a blank qualitative-review sheet. Pass `--seed-track blues/blues.00000` to generate demos from a specific track.
 
-## Step 11: consolidated results
+## Consolidated results
 
 Regenerate the full comparison table and honest findings report from all completed experiment artifacts:
 
@@ -112,9 +114,9 @@ Regenerate the full comparison table and honest findings report from all complet
 .venv/bin/python -m results.compile_results
 ```
 
-The generated `results/step11_comparison.csv` preserves metrics, confidence intervals, sources, and caveats; `results/step11_findings.md` summarizes augmentation, genre and mood modeling, embedding quality, cross-dataset degradation, and playlist coherence without treating weak genre proxies or oracle metadata as perceptual ground truth.
+The generated `results/comparison.csv` preserves metrics, confidence intervals, sources, and caveats; `results/findings.md` summarizes augmentation, genre and mood modeling, embedding quality, cross-dataset degradation, and playlist coherence without treating weak genre proxies or oracle metadata as perceptual ground truth.
 
-## Step 12: testing and validation
+## Testing and validation
 
 Run the unit/integration suite and the artifact-backed validation audit:
 
@@ -138,14 +140,14 @@ Open `http://localhost:8000/docs` for the generated OpenAPI interface. Core rout
 | Route | Purpose |
 |---|---|
 | `GET /api/health` | Deployment and artifact health |
-| `GET /api/summary` | Step 11 headline metrics and comparisons |
+| `GET /api/summary` | Consolidated results headline metrics and comparisons |
 | `GET /api/classification` | Genre CNN/GBM confidence intervals |
 | `GET /api/mood` | Valence-arousal regression results |
 | `GET /api/embeddings/{space}` | Interactive UMAP points and metrics |
 | `GET /api/similarity/{track_id}` | Four-method nearest-neighbor lookup |
 | `GET /api/generalization` | FMA classification and retrieval results |
 | `GET /api/playlists/{track_id}` | Dynamic embedding-space playlist traversal |
-| `GET /api/validation` | Step 12 validation status and evidence |
+| `GET /api/validation` | Validation status and evidence |
 
 Configure allowed browser origins through `CORS_ORIGINS`, as shown in [`.env.example`](.env.example). Multiple origins are comma-separated.
 
@@ -192,6 +194,8 @@ The backend does not require raw audio, feature caches, model checkpoints, or GP
 4. Deploy. [`frontend/vercel.json`](frontend/vercel.json) rewrites client-side routes to `index.html`.
 
 After both deployments, update Render's `CORS_ORIGINS` if the final Vercel domain differs from the value initially configured. No secrets are required by the frontend.
+
+If the dashboard reports that `<!doctype html>` is not valid JSON, the frontend is calling itself instead of FastAPI. Verify that `VITE_API_URL` is set for the relevant Vercel environment (Production and Preview as needed), contains only the Render origin such as `https://sonicmap-api.onrender.com`, and then redeploy so Vite embeds the corrected build-time value.
 
 ## Deployment scope
 

@@ -1,4 +1,4 @@
-"""Step 8: four-way audio similarity search and precision@k evaluation."""
+"""Run four-way audio similarity search and precision@k evaluation."""
 
 import argparse
 import json
@@ -104,21 +104,21 @@ def run(features_dir, classification_dir, triplet_dir, output_dir, ks, max_k, n_
 
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    comparison.to_csv(output_dir / "step8_similarity_comparison.csv", index=False)
-    metrics.to_csv(output_dir / "step8_distance_comparison.csv", index=False)
-    neighbors.drop(columns="query_index").to_parquet(output_dir / "step8_neighbors.parquet", index=False)
+    comparison.to_csv(output_dir / "similarity_comparison.csv", index=False)
+    metrics.to_csv(output_dir / "distance_comparison.csv", index=False)
+    neighbors.drop(columns="query_index").to_parquet(output_dir / "neighbors.parquet", index=False)
     qualitative = _qualitative_sheet(neighbors, labels, seed)
-    qualitative.to_csv(output_dir / "step8_qualitative_review.csv", index=False)
+    qualitative.to_csv(output_dir / "qualitative_review.csv", index=False)
     protocol = {
         "automated_relevance_signal": "same GTZAN genre label",
         "warning": "Genre agreement is a weak proxy for perceptual similarity; metadata_genre is an oracle-like upper bound, not audio retrieval.",
-        "evaluation_scope": "In-sample retrieval on the original GTZAN tracks used for full-data embedding training; Step 9 provides the out-of-distribution test.",
+        "evaluation_scope": "In-sample retrieval on the original GTZAN tracks used for full-data embedding training; FMA provides the out-of-distribution test.",
         "primary_distance": "cosine for audio representations; exact label match for metadata",
         "ks": list(ks), "max_neighbors_saved": max_k,
         "qualitative_queries": int(qualitative["query_track_id"].nunique()),
         "seed": seed,
     }
-    (output_dir / "step8_evaluation_protocol.json").write_text(json.dumps(protocol, indent=2) + "\n")
+    (output_dir / "evaluation_protocol.json").write_text(json.dumps(protocol, indent=2) + "\n")
     return comparison
 
 

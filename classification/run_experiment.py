@@ -1,5 +1,5 @@
-"""Step 4: genre classification, CNN vs. gradient boosting, with and
-without Step 3's augmentation, under 5-fold stratified cross-validation.
+"""Genre classification with CNN and gradient boosting, with and without
+audio augmentation, under five-fold stratified cross-validation.
 
 Folds are defined over the 999 original GTZAN tracks only (see cv.py for
 why). For each fold: CNN(no-aug) and GBM(no-aug) train on the fold's
@@ -17,7 +17,7 @@ Usage:
     python -m classification.run_experiment \
         --features-dir data/cache/features/gtzan \
         --augmented-dir data/cache/augmented/gtzan \
-        --n-folds 5 --epochs 15 --out classification/results/step4_classification.csv
+        --n-folds 5 --epochs 15 --out classification/results/genre_classification.csv
 """
 
 import argparse
@@ -167,7 +167,7 @@ def main() -> int:
     parser.add_argument("--n-folds", type=int, default=5)
     parser.add_argument("--epochs", type=int, default=15)
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--out", type=Path, default=Path("classification/results/step4_classification.csv"))
+    parser.add_argument("--out", type=Path, default=Path("classification/results/genre_classification.csv"))
     args = parser.parse_args()
 
     with tempfile.TemporaryDirectory(prefix="sonicmap_cv_") as tmp:

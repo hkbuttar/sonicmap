@@ -1,4 +1,4 @@
-"""Step 9: GTZAN-trained classifier and embeddings evaluated on FMA."""
+"""Evaluate the GTZAN-trained classifier and embeddings on FMA."""
 
 import argparse
 import json
@@ -66,7 +66,7 @@ def per_genre_accuracy(labels, predictions):
     return result
 
 
-def run(cache_dir, classification_dir, triplet_dir, step4_summary, step8_comparison,
+def run(cache_dir, classification_dir, triplet_dir, genre_summary, similarity_comparison,
         output_dir, ks, n_bootstrap, seed):
     manifest, mel_paths, labels = load_fma(cache_dir)
     classifier, triplet_model = load_models(
@@ -82,14 +82,14 @@ def run(cache_dir, classification_dir, triplet_dir, step4_summary, step8_compari
         "f1_macro": float(f1_score(labels, predictions, average="macro")),
     }
 
-    step4 = pd.read_csv(step4_summary)
-    in_dist_acc = float(step4[(step4["model"] == "cnn") & (step4["augmented"].astype(str).str.lower() == "true") & (step4["metric"] == "accuracy")]["mean"].iloc[0])
+    genre_results = pd.read_csv(genre_summary)
+    in_dist_acc = float(genre_results[(genre_results["model"] == "cnn") & (genre_results["augmented"].astype(str).str.lower() == "true") & (genre_results["metric"] == "accuracy")]["mean"].iloc[0])
     fma_classification["gtzan_cv_accuracy"] = in_dist_acc
     fma_classification["absolute_accuracy_drop"] = in_dist_acc - accuracy
 
     classification_embeddings = extract_embeddings(classifier, mel_paths, labels)
     triplet_embeddings = extract_embeddings(triplet_model, mel_paths, labels)
-    step8 = pd.read_csv(step8_comparison)
+    similarity_results = pd.read_csv(similarity_comparison)
     random_fma = float(np.sum((np.bincount(labels) / len(labels)) ** 2))
     random_gtzan = 0.1
     retrieval_rows = []
@@ -111,7 +111,7 @@ def run(cache_dir, classification_dir, triplet_dir, step4_summary, step8_compari
         for k in ks:
             values = precision_at_k(indices, labels, k)
             mean, low, high = bootstrap_mean_ci(values, n_bootstrap=n_bootstrap, seed=seed + model_idx * 100 + k)
-            gtzan_precision = float(step8[(step8["method"] == name) & (step8["k"] == k)]["precision_at_k"].iloc[0])
+            gtzan_precision = float(similarity_results[(similarity_results["method"] == name) & (similarity_results["k"] == k)]["precision_at_k"].iloc[0])
             fma_adjusted = adjusted_precision(mean, random_fma)
             gtzan_adjusted = adjusted_precision(gtzan_precision, random_gtzan)
             retrieval_rows.append({
@@ -127,11 +127,11 @@ def run(cache_dir, classification_dir, triplet_dir, step4_summary, step8_compari
 
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    pd.DataFrame([fma_classification]).to_csv(output_dir / "step9_classification_generalization.csv", index=False)
-    pd.DataFrame(retrieval_rows).to_csv(output_dir / "step9_similarity_generalization.csv", index=False)
-    pd.DataFrame(neighbor_tables).to_parquet(output_dir / "step9_fma_neighbors.parquet", index=False)
+    pd.DataFrame([fma_classification]).to_csv(output_dir / "classification_generalization.csv", index=False)
+    pd.DataFrame(retrieval_rows).to_csv(output_dir / "similarity_generalization.csv", index=False)
+    pd.DataFrame(neighbor_tables).to_parquet(output_dir / "fma_neighbors.parquet", index=False)
     per_class = per_genre_accuracy(labels, predictions)
-    per_class.to_csv(output_dir / "step9_per_genre_accuracy.csv", index=False)
+    per_class.to_csv(output_dir / "per_genre_accuracy.csv", index=False)
     protocol = {
         "training_dataset": "GTZAN", "evaluation_dataset": "FMA Small exact taxonomy overlap",
         "taxonomy_mapping": {"Hip-Hop": "hiphop", "Pop": "pop", "Rock": "rock"},
@@ -139,7 +139,7 @@ def run(cache_dir, classification_dir, triplet_dir, step4_summary, step8_compari
         "reason": "Excluded genres have no defensible exact GTZAN equivalent.",
         "retrieval_note": "Chance-adjusted precision is the primary cross-dataset comparison because FMA evaluation has 3 classes and GTZAN has 10.",
     }
-    (output_dir / "step9_protocol.json").write_text(json.dumps(protocol, indent=2) + "\n")
+    (output_dir / "protocol.json").write_text(json.dumps(protocol, indent=2) + "\n")
     return fma_classification, pd.DataFrame(retrieval_rows)
 
 
@@ -148,8 +148,8 @@ def main() -> int:
     parser.add_argument("--cache-dir", type=Path, default=Path("data/cache/features/fma_overlap"))
     parser.add_argument("--classification-dir", type=Path, default=Path("embeddings/results/classification"))
     parser.add_argument("--triplet-dir", type=Path, default=Path("embeddings/results/triplet"))
-    parser.add_argument("--step4-summary", type=Path, default=Path("classification/results/step4_classification_summary.csv"))
-    parser.add_argument("--step8-comparison", type=Path, default=Path("similarity/results/step8_similarity_comparison.csv"))
+    parser.add_argument("--genre-summary", type=Path, default=Path("classification/results/genre_classification_summary.csv"))
+    parser.add_argument("--similarity-comparison", type=Path, default=Path("similarity/results/similarity_comparison.csv"))
     parser.add_argument("--output-dir", type=Path, default=Path("generalization/results"))
     parser.add_argument("--ks", type=int, nargs="+", default=[1, 5, 10, 20])
     parser.add_argument("--bootstrap-samples", type=int, default=2000)
@@ -158,7 +158,7 @@ def main() -> int:
     try:
         classification, retrieval = run(
             args.cache_dir, args.classification_dir, args.triplet_dir,
-            args.step4_summary, args.step8_comparison, args.output_dir,
+            args.genre_summary, args.similarity_comparison, args.output_dir,
             tuple(sorted(set(args.ks))), args.bootstrap_samples, args.seed,
         )
     except FileNotFoundError as error:

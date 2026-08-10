@@ -1,5 +1,5 @@
 """Download a targeted FMA (Free Music Archive) subset for cross-dataset
-generalization testing (Step 9), not as a primary training set.
+generalization testing, not as a primary training set.
 
 Pulls fma_small (8,000 tracks, 8 balanced genres, 30s clips, ~7.2GB) plus
 fma_metadata (track/genre tables) from the official FMA mirror. This is

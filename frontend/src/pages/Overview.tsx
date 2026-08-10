@@ -23,7 +23,7 @@ export function Overview() {
       <Metric label="FMA accuracy" value={`${fmt(h.fma_accuracy * 100, 1)}%`} note="Unseen distribution · 3 genres"/>
     </div>
     <div className="two-col">
-      <Card><div className="card-heading"><div><span className="eyebrow">Step 4</span><h2>Genre classification</h2></div><span className="pill">95% CI</span></div>
+      <Card><div className="card-heading"><div><span className="eyebrow">Model comparison</span><h2>Genre classification</h2></div><span className="pill">95% CI</span></div>
         <ResponsiveContainer width="100%" height={300}><BarChart data={accuracy}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="name"/><YAxis domain={[0,1]}/><Tooltip/><Bar dataKey="accuracy" fill="#8df0c8" radius={[6,6,0,0]}/></BarChart></ResponsiveContainer>
       </Card>
       <Card className="finding"><span className="eyebrow">Central finding</span><h2>Simpler won—until distribution shifted.</h2><p>The classification-derived embedding beat triplet learning in-distribution. The triplet space remained weaker on FMA, but lost less quality after adjusting for the different class counts.</p><div className="validation-line"><i className="good"/><strong>{validation.data?.counts.pass ?? 0} validation checks passed</strong><span>· {validation.data?.counts.inconclusive ?? 0} inconclusive · 0 failed</span></div></Card>

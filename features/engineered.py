@@ -1,5 +1,5 @@
-"""Engineered feature vector for the gradient-boosting baseline (Step 4)
-and the engineered-feature similarity baseline (Step 8): MFCCs, chroma,
+"""Engineered feature vector for gradient boosting and feature-based
+similarity: MFCCs, chroma,
 tempo, and spectral-shape statistics, each summarized as mean+std over
 time so every track yields a fixed-length vector regardless of frame count.
 """
