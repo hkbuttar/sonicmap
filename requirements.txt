@@ -1,0 +1,36 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+# Core
+numpy
+pandas
+scipy
+scikit-learn
+
+# Audio feature extraction
+librosa
+soundfile
+audioread
+
+# Gradient boosting
+xgboost
+
+# Deep learning (CPU-only)
+torch
+
+# Dimensionality reduction / embedding viz
+umap-learn
+
+# Backend
+fastapi
+uvicorn[standard]
+pydantic
+
+# Utilities
+tqdm
+requests
+matplotlib
+pyarrow
+
+# Testing
+pytest
+pytest-cov
