@@ -1,0 +1,12 @@
+{
+  "strategy": "greedy local traversal with a linearly increasing target distance from the seed",
+  "playlist_length": 10,
+  "drift_quantile": 0.25,
+  "drift_weight": 1.0,
+  "evaluation_seed_tracks": 100,
+  "random_playlists_per_seed": 50,
+  "coherence_primary_metric": "average pairwise cosine similarity",
+  "comparison_note": "Compare each method's lift over its own random baseline; absolute cosine levels are not directly comparable across separately trained embedding spaces.",
+  "qualitative_note": "Human review remains necessary; genre and embedding similarity do not fully capture playlist flow.",
+  "seed": 42
+}

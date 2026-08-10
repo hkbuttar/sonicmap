@@ -52,3 +52,13 @@ Cache the exact-overlap portion of FMA Small, then evaluate the GTZAN-trained cl
 ```
 
 The conservative taxonomy alignment is `Hip-Hop → hiphop`, `Pop → pop`, and `Rock → rock` (3,000 FMA tracks). The five other FMA Small genres are excluded because they lack exact GTZAN equivalents. Reports include classification accuracy/F1, per-genre accuracy, retrieval precision@k, bootstrap intervals, and chance-adjusted retrieval drops to account for FMA's three-class evaluation versus GTZAN's ten classes.
+
+## Step 10: playlist generation
+
+Generate gradually drifting playlists in both learned embedding spaces and compare their coherence with matched random playlists:
+
+```bash
+.venv/bin/python -m similarity.run_playlist_evaluation
+```
+
+The default evaluates 100 stratified seeds with 50 random playlists per seed and creates one demo playlist per genre for each embedding. Reports include average pairwise and adjacent cosine similarity, seed-genre retention, drift behavior, bootstrap confidence intervals, generated track sequences, and a blank qualitative-review sheet. Pass `--seed-track blues/blues.00000` to generate demos from a specific track.
