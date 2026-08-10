@@ -1,0 +1,17 @@
+{
+  "embedding_silhouette_cosine": 0.254576176404953,
+  "projection_silhouette_euclidean": 0.20731864869594574,
+  "initial_triplet_loss": 0.11192457139492035,
+  "final_triplet_loss": 0.05883482241630554,
+  "n_tracks": 999,
+  "embedding_dim": 128,
+  "training_samples": 5994,
+  "triplets_per_epoch": 2000,
+  "augmented_training": true,
+  "margin": 0.2,
+  "projection_method": "umap",
+  "epochs": 15,
+  "seed": 42,
+  "classification_embedding_silhouette_cosine": 0.3337051272392273,
+  "silhouette_delta_vs_classification": -0.07912895083427429
+}

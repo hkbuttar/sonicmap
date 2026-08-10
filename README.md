@@ -11,3 +11,23 @@ python -m mood.run_experiment --n-folds 5 --epochs 15
 ```
 
 The experiment predicts DEAM's real song-level continuous valence and arousal annotations. It reports MAE, RMSE, and R² separately for each coordinate, with fold-level 95% t confidence intervals, for both a mel-spectrogram CNN and gradient-boosted engineered-feature regressors.
+
+## Step 6: classification-derived embedding
+
+Train the best Step 4 CNN condition on all GTZAN training data, extract its 128-dimensional penultimate layer for each original track, and create a UMAP projection:
+
+```bash
+.venv/bin/python -m embeddings.run_classification_embedding --epochs 15
+```
+
+Artifacts are written to `embeddings/results/classification/`: L2-normalized embeddings for similarity search, track metadata and 2D coordinates, a projection plot, cosine silhouette score against genre labels, and the full-data CNN checkpoint. Use `--projection tsne` for t-SNE or `--no-augmentation` to train only on original tracks.
+
+## Step 7: triplet-loss embedding
+
+Train a separate similarity network with explicit genre-supervised anchor/positive/negative triplets:
+
+```bash
+.venv/bin/python -m embeddings.run_triplet_embedding --epochs 15
+```
+
+Same-genre positives are sampled from a different source track, preventing an original clip and its augmentation from forming a trivial pair; negatives come from another genre. The default uses 2,000 triplets per epoch and margin `0.2`. Artifacts in `embeddings/results/triplet/` use the same ordering and 128-dimensional normalized format as Step 6, and include loss history, UMAP coordinates, silhouette scores, a checkpoint, and the silhouette delta versus the classification-derived embedding.

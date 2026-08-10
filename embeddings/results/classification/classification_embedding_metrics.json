@@ -1,0 +1,11 @@
+{
+  "embedding_silhouette_cosine": 0.3337051272392273,
+  "projection_silhouette_euclidean": 0.5121812224388123,
+  "n_tracks": 999,
+  "embedding_dim": 128,
+  "training_samples": 5994,
+  "augmented_training": true,
+  "projection_method": "umap",
+  "epochs": 15,
+  "seed": 42
+}
