@@ -1,6 +1,47 @@
 # SonicMap — Genre/Mood Classification & Audio-Native Similarity Search
 Music genre and valence-arousal mood modeling with audio-native similarity search. CNN and gradient-boosted classifiers, a contrastive similarity embedding compared against a classification-derived one, cross-dataset validation, and playlist generation. Real audio, CPU-only.
 
+## Headline findings
+
+| Experiment | Result |
+|---|---:|
+| Best GTZAN genre accuracy | 75.9% (augmented CNN, 5-fold CV) |
+| DEAM mood regression | R² 0.395 valence / 0.446 arousal (GBM) |
+| GTZAN similarity P@10 | 0.890 classification embedding / 0.677 triplet |
+| FMA out-of-distribution accuracy | 34.6% on 2,999 exact-overlap tracks |
+| Playlist pairwise-similarity lift | +0.390 classification / +0.243 triplet |
+| Validation | 39 tests; 18 passed audit checks, 1 inconclusive, 0 failed |
+
+The central negative result is useful: training specifically with triplet loss did not beat the classification-derived embedding in-distribution. It did, however, suffer a smaller chance-adjusted retrieval drop on FMA. See [`results/step11_findings.md`](results/step11_findings.md) and the executed [`notebooks/research.ipynb`](notebooks/research.ipynb) for the complete interpretation and limitations.
+
+## Repository map
+
+```text
+features/          cached mel and engineered-feature extraction
+augmentation/      pitch, stretch, and noise transforms
+classification/    genre CNN/GBM experiments
+mood/              continuous DEAM valence-arousal regression
+embeddings/        classification-derived and triplet spaces
+similarity/        retrieval evaluation and playlist traversal
+generalization/    GTZAN-to-FMA evaluation
+validation/        artifact-backed Step 12 audit
+backend/           FastAPI read-only results API
+frontend/          React, TypeScript, Vite dashboard
+notebooks/         executed research notebook and builder
+```
+
+## Setup
+
+Python 3.13 and Node.js 20+ are recommended.
+
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -r requirements.txt
+cd frontend && npm install && cd ..
+```
+
+Raw audio and feature caches are intentionally excluded from Git. Download datasets with `scripts/download_*.py`; dataset choices and limitations are documented in [`data/DATASETS.md`](data/DATASETS.md).
+
 ## Step 5: mood regression
 
 Run the DEAM valence-arousal comparison after downloading DEAM and caching its features:
@@ -83,3 +124,77 @@ Run the unit/integration suite and the artifact-backed validation audit:
 ```
 
 The audit checks classifier/regressor performance against random baselines, CV partition and augmentation leakage integrity, triplet-loss and silhouette improvement, similarity sanity, FMA cache/result alignment, and playlist lift. Critical failures return a nonzero exit code; statistically inconclusive findings remain explicitly inconclusive rather than being forced into pass/fail claims.
+
+## FastAPI backend
+
+The API is read-only and serves committed experiment artifacts; it does not retrain models or host audio.
+
+```bash
+.venv/bin/uvicorn backend.app:app --reload
+```
+
+Open `http://localhost:8000/docs` for the generated OpenAPI interface. Core routes:
+
+| Route | Purpose |
+|---|---|
+| `GET /api/health` | Deployment and artifact health |
+| `GET /api/summary` | Step 11 headline metrics and comparisons |
+| `GET /api/classification` | Genre CNN/GBM confidence intervals |
+| `GET /api/mood` | Valence-arousal regression results |
+| `GET /api/embeddings/{space}` | Interactive UMAP points and metrics |
+| `GET /api/similarity/{track_id}` | Four-method nearest-neighbor lookup |
+| `GET /api/generalization` | FMA classification and retrieval results |
+| `GET /api/playlists/{track_id}` | Dynamic embedding-space playlist traversal |
+| `GET /api/validation` | Step 12 validation status and evidence |
+
+Configure allowed browser origins through `CORS_ORIGINS`, as shown in [`.env.example`](.env.example). Multiple origins are comma-separated.
+
+## React dashboard
+
+The frontend uses React, TypeScript, Vite, TanStack Query, Recharts, and a lazy-loaded WebGL-only Plotly bundle. It includes Overview, Embeddings, Similarity, Generalization, and Playlist views. Audio playback is deliberately excluded from the first deployment to avoid file-hosting complexity and false implications that automated metrics replace listening.
+
+```bash
+# Terminal 1
+.venv/bin/uvicorn backend.app:app --reload
+
+# Terminal 2
+cd frontend
+npm run dev
+```
+
+Vite proxies `/api` to `http://localhost:8000` locally. To use a remote API, copy [`frontend/.env.example`](frontend/.env.example) to `frontend/.env` and set `VITE_API_URL`.
+
+Production checks:
+
+```bash
+.venv/bin/python -m pytest -q
+cd frontend
+npm test
+npm run build
+```
+
+## Deployment
+
+### Backend on Render
+
+1. Push the repository, including the generated CSV/JSON/Parquet/NumPy artifacts, to GitHub.
+2. In Render, create a Blueprint from [`render.yaml`](render.yaml). It uses the minimal [`backend/requirements-api.txt`](backend/requirements-api.txt), starts Uvicorn, and checks `/api/health`.
+3. Set `CORS_ORIGINS` to the final Vercel URL, for example `https://sonicmap.vercel.app`. Add comma-separated preview/local origins only when needed.
+4. Confirm `https://<render-service>/api/health` returns `{"status":"ok"}`.
+
+The backend does not require raw audio, feature caches, model checkpoints, or GPU support at runtime.
+
+### Frontend on Vercel
+
+1. Import the same repository and set the Vercel project root directory to `frontend`.
+2. Vercel detects Vite; use build command `npm run build` and output directory `dist`.
+3. Set `VITE_API_URL=https://<render-service>` with no trailing slash.
+4. Deploy. [`frontend/vercel.json`](frontend/vercel.json) rewrites client-side routes to `index.html`.
+
+After both deployments, update Render's `CORS_ORIGINS` if the final Vercel domain differs from the value initially configured. No secrets are required by the frontend.
+
+## Deployment scope
+
+- Included: all experiment metrics, embedding projections, similarity lookup, FMA results, dynamic metadata-only playlists, and validation evidence.
+- Excluded: raw dataset downloads, training jobs, user uploads, authentication, and audio playback.
+- The API serves precomputed research artifacts, so the deployed dashboard is a reproducible report and exploration surface—not an online inference service.

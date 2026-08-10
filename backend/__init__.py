@@ -1,0 +1,1 @@
+"""SonicMap FastAPI service."""
